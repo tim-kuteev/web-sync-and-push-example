@@ -15,13 +15,11 @@
   };
 
   function requestPermission() {
-    return new Promise((resolve, reject) => {
-      Notification.requestPermission((result) => {
-        if (result !== 'granted') {
-          return reject(Error('Denied notification permission'));
-        }
-        resolve(result);
-      });
+    return Notification.requestPermission().then(result => {
+      if (result !== 'granted') {
+        throw new Error('Denied notification permission');
+      }
+      return result;
     });
   }
 

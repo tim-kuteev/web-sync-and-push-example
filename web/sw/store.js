@@ -1,4 +1,6 @@
-__swStore = (function () {
+(function (global) {
+  'use strict';
+
   const DB_NAME = 'sw-store';
   const STORE_NAME = 'outbox';
 
@@ -11,7 +13,7 @@ __swStore = (function () {
       return new Promise((resolve, reject) => {
         const dbOpen = indexedDB.open(DB_NAME, 1);
         dbOpen.onupgradeneeded = () => {
-          dbOpen.result.createObjectStore(STORE_NAME, {keyPath: 'id'}).createIndex('idx', 'id');
+          dbOpen.result.createObjectStore(STORE_NAME, {keyPath: 'id'});
         };
         dbOpen.onerror = () => reject(dbOpen.error);
         dbOpen.onsuccess = () => resolve(dbOpen.result);
@@ -42,10 +44,10 @@ __swStore = (function () {
 
     getAll() {
       return this.transaction('readonly', store => {
-        return store.index('idx').getAll();
+        return store.getAll();
       });
     }
   }
 
-  return new Store();
-})();
+  global.__swStore = new Store();
+})(self);

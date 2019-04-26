@@ -1,1 +1,3 @@
-__apiUrl = 'http://localhost:8888';
+(function (global) {
+  global.__apiUrl = 'http://localhost:8888';
+})(self);

@@ -1,4 +1,5 @@
-__swUtils = (function () {
+(function (global) {
+  'use strict';
 
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -35,8 +36,8 @@ __swUtils = (function () {
     });
   }
 
-  return {
+  global.__swUtils = {
     getSubscription,
     broadcast,
   };
-})();
+})(self);
