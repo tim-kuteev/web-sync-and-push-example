@@ -1,0 +1,14 @@
+{
+  "name": "web-sync-and-push-example",
+  "version": "1.0.0",
+  "author": "Tim",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-static": "^0.7.11",
+    "web-push": "^3.3.3"
+  }
+}

@@ -15,7 +15,7 @@
   async function onActivate() {
     const cacheNames = await caches.keys();
     const promises = cacheNames.map((cacheName) => {
-      if (!CURRENT_CACHE !== cacheName) {
+      if (CURRENT_CACHE !== cacheName) {
         console.log('Deleting out of date cache:', cacheName);
         return caches.delete(cacheName);
       }
@@ -32,7 +32,7 @@
     }
     const networkRes = await fetch(event.request);
     if (networkRes.ok) {
-      cache.put(event.request, networkRes.clone());
+      await cache.put(event.request, networkRes.clone());
     }
     return networkRes;
   }

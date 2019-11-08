@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <title>Web Sync and Push Example</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0">
   <style>
     body {
@@ -9,13 +10,12 @@
   </style>
 </head>
 <body>
-  <form>
+  <form id="app_form">
     <input id="payload" type="text" placeholder="Payload">
     <input id="delay" type="number" placeholder="Delay">
+    <button type="submit">Request notification</button>
   </form>
-  <button class="notification">Request notification</button>
-  <div class="log"></div>
+  <div id="log"></div>
   <script type="text/javascript" src="app.js"></script>
-  <script type="text/javascript" src="sw/store.js"></script>
 </body>
 </html>

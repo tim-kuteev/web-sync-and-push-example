@@ -1,3 +1,4 @@
+/* global __swUtils */
 (function () {
   'use strict';
 
@@ -8,7 +9,8 @@
   self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     if (event.action === 'explore') {
-      event.waitUntil(clients.openWindow('https://google.com'));
+      const url = encodeURI(`https://www.google.com/search?q=${event.notification.body}`);
+      event.waitUntil(clients.openWindow(url));
     }
   });
 

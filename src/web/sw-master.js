@@ -2,7 +2,6 @@
   'use strict';
 
   importScripts(
-    './api-url.js',
     './sw/utils.js',
     './sw/store.js',
     // './sw/cache.js',

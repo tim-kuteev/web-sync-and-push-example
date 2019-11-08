@@ -1,6 +1,5 @@
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const StaticServer = require('node-static').Server;
 const webPush = require('web-push');
 
 const PORT = 8888;
@@ -12,10 +11,13 @@ webPush.setVapidDetails(
   vapidKeys.privateKey,
 );
 
+const fileServer = new StaticServer(__dirname + '/web');
+
 const app = express();
 
-app.use(cors({origin: true, credentials: true}));
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
 app.use('/favicon.ico', (req, res, next) => res.sendStatus(204));
 
 app.use((req, res, next) => {
@@ -31,13 +33,17 @@ app.post('/request-notification', (req, res, next) => {
   setTimeout(() => {
     webPush
       .sendNotification(req.body.subscription, req.body.payload)
-      .catch(console.log);
+      .catch(console.error);
   }, req.body.delay);
   res.sendStatus(200);
 });
 
+app.use((req, res, next) => {
+  fileServer.serve(req, res).on('error', (err) => res.sendStatus(404));
+});
+
 app.use((err, req, res, next) => {
-  console.log(err);
+  console.error(err);
   res.sendStatus(500);
 });
 
@@ -46,5 +52,5 @@ app.listen(PORT, () => {
 });
 
 process.on('uncaughtException', (err) => {
-  console.log(err);
+  console.error(err);
 });
