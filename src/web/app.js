@@ -3,25 +3,20 @@
   'use strict';
 
   const logEl = document.getElementById('log');
+  const formEl = document.getElementById('app_form');
+  const payloadEl = document.getElementById('payload');
+  const delayEl = document.getElementById('delay');
 
-  function log(msg) {
+  function log(msg, ...rest) {
     const p = document.createElement('p');
     p.textContent = typeof msg === 'object' ? JSON.stringify(msg) : msg;
     logEl.appendChild(p);
-    console.log(msg);
+    console.log(msg, ...rest);
   }
 
   window.onerror = (msg) => {
     log(msg);
   };
-
-  async function requestPermission() {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      throw new Error('Denied notification permission');
-    }
-    return permission;
-  }
 
   function checkSupport() {
     if (!('serviceWorker' in navigator)) {
@@ -33,31 +28,54 @@
     return true;
   }
 
-  function main() {
-    navigator.serviceWorker.register('sw-master.js')
-      .then(reg => log('Service Worker registered'))
-      .catch(err => log('Service Worker registration failed'));
-
+  async function registerSW() {
+    let registration;
+    try {
+      registration = await navigator.serviceWorker.register('sw-master.js');
+      log('Service Worker registered');
+    } catch (err) {
+      log('Service Worker registration failed', err);
+      return;
+    }
     navigator.serviceWorker.addEventListener('message', (event) => {
-      log(`Received: ${event.data}`);
+      log(`Received from Service Worker: ${event.data}`);
     });
+    return registration;
+  }
 
-    document.getElementById('app_form').addEventListener('submit', async (event) => {
-      try {
-        event.preventDefault();
-        await requestPermission();
+  async function handleSubmit(registration) {
+    log('Submit form');
 
-        const payload = document.getElementById('payload').value;
-        const delay = document.getElementById('delay').value;
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      log('Denied notification permission');
+      return;
+    }
 
-        const registration = await navigator.serviceWorker.ready;
-        registration.active.postMessage({tag: 'request-notification', content: {payload, delay}});
-        log('Message sent to the Service Worker');
-      } catch (err) {
-        log(err.message)
-      }
+    // const registration = await navigator.serviceWorker.ready;
+    registration.active.postMessage({
+      tag: 'request-notification',
+      content: {
+        payload: payloadEl.value,
+        delay: delayEl.value,
+      },
+    });
+    log('Message sent to the Service Worker');
+  }
+
+  async function main() {
+    if (!checkSupport()) {
+      return;
+    }
+    const registration = await registerSW();
+    if (!registration) {
+      return;
+    }
+    formEl.addEventListener('submit', (event) => {
+      event.preventDefault();
+      handleSubmit(registration).catch(err => log(err.message, err));
     });
   }
 
-  checkSupport() && main();
+  main().catch(err => log(err.message, err));
 })();

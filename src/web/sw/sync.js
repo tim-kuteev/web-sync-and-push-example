@@ -19,9 +19,10 @@
   async function requestNotification(req) {
     try {
       if (navigator.onLine) {
-        __swUtils.broadcast('Online: performing request');
+        __swUtils.broadcast('Online - performing request');
         return await performRequest(req)
       }
+      __swUtils.broadcast('Offline - storing request');
       await __swStore.add({
         id: Date.now(),
         payload: req.payload,
@@ -54,7 +55,7 @@
 
   async function performRequest(req) {
     const subscription = await getSubscription();
-    const response = await fetch('/request-notification', {
+    const response = await fetch('/api/request-notification', {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -77,7 +78,7 @@
     if (subscription) {
       return subscription;
     }
-    let response = await fetch('/vapid-key');
+    let response = await fetch('/api/vapid-key');
     if (!response.ok) {
       throw new Error('Vapid key request failed');
     }
